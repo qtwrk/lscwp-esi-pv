@@ -4,10 +4,10 @@ Plugin Name: Post View Counter
 Description: track and display post view by ESI block
 */
 
-
 defined('WPINC') || exit;
 
 function check_lscwp_esi_status() {
+    $shortcode = false;
     if (!defined('LSCWP_V') || ! apply_filters( 'litespeed_esi_status', false )  ) {
     return;
     }
@@ -16,11 +16,19 @@ function check_lscwp_esi_status() {
         add_action('wp_head', 'lscwp_esi_counting');
         add_action( 'litespeed_esi_load-pv_couting_esi_block', 'pv_couting_esi_block_esi_load' );
         add_action( 'litespeed_esi_load-pv_display_esi_block', 'pv_display_esi_block_esi_load' );
-        add_action('wp_head', 'lscwp_esi_display_count'); 
+        if ($shortcode){
+          add_action('wp_head', 'lscwp_esi_display_count'); 
+        }
+        else {
+          add_shortcode('post_view_display', 'lscwp_esi_display_count_shortcode');
+        }
     }
 }
 add_action('init', 'check_lscwp_esi_status', 999);
 
+function lscwp_esi_display_count_shortcode() {
+    return apply_filters('litespeed_esi_url', 'pv_display_esi_block', 'Post View Display ESI block');
+}
 
 function lscwp_esi_counting() {
 echo apply_filters( 'litespeed_esi_url', 'pv_couting_esi_block', 'Post View Counting ESI block' );
@@ -68,4 +76,3 @@ function pv_display_esi_block_esi_load(){
 function lscwp_esi_display_count() {
 echo apply_filters( 'litespeed_esi_url', 'pv_display_esi_block', 'Post View Display ESI block' );
 }
-
